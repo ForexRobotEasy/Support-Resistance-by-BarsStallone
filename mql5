@@ -1,0 +1,65 @@
+
+// Support Resistance by BarsStallone
+// Developer: Forex Robot Easy Team
+// Site: forexroboteasy.com
+
+#property indicator_chart_window
+#property indicator_buffers 2
+
+// Input parameters
+extern int period = 14;
+
+// Indicator buffers
+double SupportBuffer[];
+double ResistanceBuffer[];
+
+// Initialization function
+int OnInit()
+{
+    // Set indicator buffers
+    SetIndexBuffer(0, SupportBuffer);
+    SetIndexBuffer(1, ResistanceBuffer);
+
+    // Set indicator labels
+    IndicatorShortName('BarsStallone');
+    SetIndexLabel(0, 'Support');
+    SetIndexLabel(1, 'Resistance');
+
+    return(INIT_SUCCEEDED);
+}
+
+// Calculation function
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+    // Calculate Support and Resistance levels
+    for(int i = period; i < rates_total; i++)
+    {
+        double highestHigh = High[i - period];
+        double lowestLow = Low[i - period];
+
+        // Find highest high and lowest low within the specified period
+        for(int j = i - period + 1; j <= i; j++)
+        {
+            if(High[j] > highestHigh)
+                highestHigh = High[j];
+
+            if(Low[j] < lowestLow)
+                lowestLow = Low[j];
+        }
+
+        // Set Support and Resistance levels in indicator buffers
+        SupportBuffer[i] = lowestLow;
+        ResistanceBuffer[i] = highestHigh;
+    }
+
+    return(rates_total);
+}
